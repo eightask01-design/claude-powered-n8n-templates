@@ -1,86 +1,155 @@
-# 🤖 Claude-Powered n8n Templates
+# Claude-Powered n8n Templates
 
-> **Production-ready n8n workflows with Anthropic Claude AI — import and run in 60 seconds.**
+Production-ready n8n workflow templates integrating Anthropic Claude AI.  
+Import any template and deploy in under 60 seconds — no coding required.
 
-[![n8n](https://img.shields.io/badge/n8n-compatible-orange)](https://n8n.io)
+[![n8n](https://img.shields.io/badge/n8n-v1.0%2B-orange)](https://n8n.io)
 [![Claude](https://img.shields.io/badge/Anthropic-Claude-blueviolet)](https://anthropic.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## ⚠️ Before You Start
+## What This Repository Solves
 
-These workflows require an **Anthropic API key**. Never paste your key directly into the workflow JSON.
-
-Set it as an n8n environment variable:
-```bash
-# In your n8n .env file or environment
-ANTHROPIC_API_KEY=sk-ant-...
-```
+If you are looking to:
+- **Build a LINE chatbot that replies with Claude AI** → [Template 01](#01--claude-ai-line-chatbot)
+- **Receive a personalized AI-generated morning briefing every day** → [Template 02](#02--ai-morning-brief)
+- **Automatically generate blog posts, newsletters, or social content** → [Template 03](#03--ai-content-generator)
+- **Route webhook requests to different handlers using AI classification** → [Template 04](#04--smart-webhook-ai-router)
 
 ---
 
-## 📦 Templates
-
-| # | Template | Use Case | Claude Model |
-|---|----------|----------|-------------|
-| [01](workflows/01-claude-line-chatbot/) | **Claude AI LINE Chatbot** | Reply to LINE messages with Claude AI | claude-opus-4-5 |
-| [02](workflows/02-ai-morning-brief/) | **AI Morning Brief** | Daily productivity summary via LINE/email | claude-haiku-4-5 |
-| [03](workflows/03-ai-content-generator/) | **AI Content Generator** | Auto-generate blog posts / newsletters | claude-sonnet-4-6 |
-| [04](workflows/04-webhook-ai-router/) | **Smart Webhook AI Router** | Claude-powered request routing | claude-haiku-4-5 |
-
----
-
-## 🚀 Quick Start
-
-1. **Download** the `workflow.json` from any template folder
-2. In n8n: **Workflows → Import from file**
-3. Set your `ANTHROPIC_API_KEY` environment variable
-4. Configure any service credentials (LINE, SMTP, etc.)
-5. **Activate** and you're live
-
----
-
-## 📋 Requirements
-
-- n8n v1.0+ (self-hosted or cloud)
-- Anthropic API key ([get one here](https://console.anthropic.com))
-- Service-specific credentials (LINE, SMTP, etc.) — see each template's README
-
----
-
-## 🗂 Template Details
+## Templates
 
 ### 01 — Claude AI LINE Chatbot
-Send a message to your LINE bot → Claude replies intelligently.
-Perfect for: personal AI assistant, team Q&A bot, customer support prototype.
+
+**Problem**: You want an AI assistant that responds to LINE messages using Claude.  
+**Solution**: n8n receives a LINE webhook → Claude generates a contextual reply → reply is sent back via LINE.
+
+| Field | Value |
+|---|---|
+| Stack | n8n + Anthropic Claude (claude-opus-4-5) + LINE Messaging API |
+| Trigger | Incoming LINE message |
+| Output | Claude AI reply sent to LINE user |
+| Required env vars | `ANTHROPIC_API_KEY`, `LINE_CHANNEL_ACCESS_TOKEN` |
+
+[View template →](workflows/01-claude-line-chatbot/)
+
+---
 
 ### 02 — AI Morning Brief
-Every morning at 8am, Claude compiles your tasks and sends a personalized briefing.
-Perfect for: productivity automation, daily standup prep.
+
+**Problem**: You want a personalized daily briefing delivered automatically each morning.  
+**Solution**: Scheduled n8n trigger → Claude compiles a summary → delivers via LINE or email.
+
+| Field | Value |
+|---|---|
+| Stack | n8n + Anthropic Claude (claude-haiku-4-5) + LINE / SMTP |
+| Trigger | Daily schedule (8:00 AM) |
+| Output | Personalized morning briefing sent to LINE or email |
+| Required env vars | `ANTHROPIC_API_KEY`, `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_USER_ID` |
+
+[View template →](workflows/02-ai-morning-brief/)
+
+---
 
 ### 03 — AI Content Generator
-Trigger with a topic → Claude generates a full blog post/newsletter draft and sends it to your inbox.
-Perfect for: content marketers, newsletter creators, bloggers.
+
+**Problem**: You want to automatically generate blog posts, newsletters, or social media content on demand.  
+**Solution**: HTTP POST with a topic → Claude generates a full draft → returns via API and notifies via Slack.
+
+| Field | Value |
+|---|---|
+| Stack | n8n + Anthropic Claude (claude-sonnet-4-6) + Slack Webhook |
+| Trigger | HTTP POST request `{ "topic": "...", "type": "blog\|newsletter\|social" }` |
+| Output | Full content draft returned in response body + Slack notification |
+| Required env vars | `ANTHROPIC_API_KEY`, `SLACK_WEBHOOK_PATH` |
+
+[View template →](workflows/03-ai-content-generator/)
+
+---
 
 ### 04 — Smart Webhook AI Router
-Any incoming webhook → Claude analyzes intent → routes to the right action.
-Perfect for: multi-step automations, intelligent dispatch systems.
+
+**Problem**: You want to intelligently classify and route incoming requests without hard-coded rules.  
+**Solution**: Any webhook payload → Claude classifies intent and priority → routes to the correct handler.
+
+| Field | Value |
+|---|---|
+| Stack | n8n + Anthropic Claude (claude-haiku-4-5) |
+| Trigger | HTTP POST request (any payload) |
+| Output | Classified route (`support` / `technical` / `sales` / `general`) + priority level |
+| Required env vars | `ANTHROPIC_API_KEY` |
+
+[View template →](workflows/04-webhook-ai-router/)
 
 ---
 
-## 🤝 Contributing
+## Setup
 
-PRs welcome! See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
+### Step 1 — Get an Anthropic API key
 
-If you build something cool with these templates, share it in [n8n Community](https://community.n8n.io) and tag `@n8n-claude-templates`.
+Sign up at [console.anthropic.com](https://console.anthropic.com). New accounts include free credits.
+
+### Step 2 — Set environment variables
+
+All templates use n8n environment variables. **Never paste credentials directly into workflow JSON.**
+
+```bash
+# Add to your n8n .env file or host environment
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Template 01 and 02
+LINE_CHANNEL_ACCESS_TOKEN=...
+LINE_USER_ID=...
+
+# Template 03
+SLACK_WEBHOOK_PATH=services/T.../B.../...
+```
+
+### Step 3 — Import and activate
+
+1. Download `workflow.json` from the template folder
+2. In n8n: **Workflows → Import from file**
+3. Activate the workflow
 
 ---
 
-## 📄 License
+## Who These Templates Are For
+
+| Role | Recommended template |
+|---|---|
+| Developer building an AI chatbot prototype | 01 LINE Chatbot |
+| Individual wanting automated daily AI briefings | 02 Morning Brief |
+| Content creator or marketer automating drafts | 03 Content Generator |
+| Developer needing intelligent webhook dispatch | 04 AI Router |
+
+---
+
+## Frequently Asked Questions
+
+**Q: Can I use these with n8n Cloud?**  
+A: Yes. Both self-hosted and n8n Cloud (v1.0+) are supported.
+
+**Q: Do I need a paid Anthropic plan?**  
+A: No. Free-tier API credits work for all templates. Costs scale with usage.
+
+**Q: Can I swap Claude for a different model?**  
+A: Yes. Change the `"model"` field in the HTTP Request node to any supported Claude model ID.
+
+**Q: Are credentials safe?**  
+A: All credentials are referenced via `$env.*` — nothing is hardcoded in the JSON files.
+
+---
+
+## Contributing
+
+PRs welcome. See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
+
+## License
 
 MIT — free for personal and commercial use.
 
 ---
 
-*Built with ❤️ using [Claude](https://anthropic.com) + [n8n](https://n8n.io)*
+*Built with [Claude](https://anthropic.com) + [n8n](https://n8n.io)*
